@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>PyTanic</title>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+        <script src="bootstrap-slider.js"></script>
+        <link href="bootstrap-slider.css" rel="stylesheet">
+    <script type="text/javascript">
+    $(function() {
+
+        ["#inputAge", "#inputSibSp", "#inputParc", "#inputFare"].forEach(function(e) {
+            $(e).slider({
+                formatter: function(value) {
+                    return 'Current value: ' + value;
+                }
+            })
+        });
+
+        var update = function() {
+            var formVals = $("#oddsForm").serialize();
+            var cls = $('#inputCls').val();
+            if(true) {
+            var url = "http://"+window.location.host+"/v1/blocks/probabilizer"+cls+"/application?"+formVals;
+            $("#urlCalled").text(url);
+            $.ajax({
+                url: url,
+                dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.status + textStatus);
+                      },
+                success: function(data) {
+                    var score = parseFloat(data.pins.prob) * 100;
+                    $('.progress-bar').css('width', score+'%').attr('aria-valuenow', score);
+                    $('.progress-bar').text(score.toFixed(2)+"%");
+                }
+            });
+            }
+           
+            if(false) { 
+            var url = "http://"+window.location.host+"/v1/plugins/pytanic/routes/multiApply?"+formVals;
+            $("#urlCalled").text(url);
+            $.ajax({
+                url: url,
+                dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.status + textStatus);
+                      },
+                success: function(data) {
+                    for(var cls in data) {
+                        var score = parseFloat(data[cls]) * 100;
+                        $('.progress-bar-'+cls).css('width', score+'%').attr('aria-valuenow', score);
+                        $('.progress-bar-'+cls).text(score.toFixed(2)+"%");
+                    }
+                }
+            });
+            }
+
+            /*
+            var urlExpl = "http://"+window.location.host+"/v1/blocks/explainBlock"+cls+"/application?"+formVals;
+            $("#urlCalledExpl").text(urlExpl);
+            $.ajax({
+                url: urlExpl,
+                dataType: "json",
+                error: function (jqXHR, textStatus, errorThrown) {
+                        alert(jqXHR.status + textStatus);
+                      },
+                success: function(data) {
+                for(var feature in data.pins) {
+                    var sf = feature.split(":");
+                        $('#explain'+sf[1]).text(data.pins[feature]);
+                    }
+                }
+            });
+            */
+        };
+
+        // Update the prob is anything changes
+        $("form :input").change(function() {
+            update();
+        });
+
+        // update on load
+        update();
+    });
+    </script>
+    </head>
+    <body>
+ <div class="container">
+        <div class="jumbotron">
+              <h1>PyTanic</h1>
+                <p>What are your chances??</p>
+              <p><img src="titanic.jpg"></p>
+      </div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Passenger information</h3>
+  </div>
+  <div class="panel-body">
+    <form id="oddsForm" class="form-horizontal">
+        <div class="row">
+            <div class="col-xs-6 col-md-4 h4 text-right">Feature</div>
+            <div class="col-xs-6 col-md-4 h4">Value</div>
+            <!-- <div class="col-xs-6 col-md-4 h4">Explain</div> -->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Passenger class</div>
+            <div class="col-xs-6 col-md-4">
+                <select class="form-control" name="Pclass" id="inputPclass" placeholder="PClass">
+                  <option value="c1">1st ~ Upper</option>
+                  <option value="c2">2nd ~ Middle</option>
+                  <option value="c3">3rd ~ Lower</option>
+                </select> 
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainPclass"></div> -->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Gender</div>
+            <div class="col-xs-6 col-md-4">
+                <select class="form-control" name="Sex" id="inputSex" placeholder="Sex">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="nd">Don't specify</option>
+                </select> 
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainSex"></div> -->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Age</div>
+            <div class="col-xs-6 col-md-4">
+                <input type="text" name="Age" id="inputAge" placeholder="0.419 to 80" data-slider-id='ex1Slider' data-slider-min="1" data-slider-max="90" data-slider-step="1" data-slider-value="35">
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainAge"></div>-->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">
+            Number of Siblings/Spouses Aboard</div>
+            <div class="col-xs-6 col-md-4">
+                <input type="text" class="form-control" name="SibSp" id="inputSibSp" placeholder="0 to 8" data-slider-id='ex2Slider' data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value="1">
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainSibSp"></div> -->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Number of Parents/Children Aboard</div>
+            <div class="col-xs-6 col-md-4">
+                <input type="text" class="form-control" name="Parch" id="inputParc" placeholder="0 to 6" data-slider-id='ex3Slider' data-slider-min="0" data-slider-max="6" data-slider-step="1" data-slider-value="0">
+            
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainParch"></div> -->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Fare</div>
+            <div class="col-xs-6 col-md-4">
+                <input type="text" class="form-control" name="Fare" id="inputFare" placeholder="0 to 512$" data-slider-id='ex4Slider' data-slider-min="0" data-slider-max="515" data-slider-step="1" data-slider-value="32">
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainFare"></div> -->
+        </div>
+        
+        <!--
+        <div class="form-group">
+            <label for="inputCabin" class="col-sm-2 control-label">Cabin</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="Cabin" id="inputCabin" placeholder="Cabin">
+            </div>
+        </div>
+        -->
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Port of Embarkation</div>
+            <div class="col-xs-6 col-md-4">
+                <select class="form-control" id="inputEmbarked" name="Embarked" placeholder="Embarked">
+                  <option value="C">Cherbourg</option>
+                  <option value="Q">Queenstown</option>
+                  <option value="S">Southampton</option>
+                  <option value="nd">Don't specify</option>
+                </select> 
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainEmbarked"></div> -->
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Classifier</div>
+            <div class="col-xs-6 col-md-4">
+                <select class="form-control" id="inputCls" name="Classifier" placeholder="Classifier">
+                  <option value="bbdt">bagged boosted decision tree</option>
+                  <option value="dt">decision tree</option>
+                  <option value="glz">glz</option>
+                </select> 
+            </div>
+            <div class="col-xs-6 col-md-4"></div>
+        </div>
+    </form>
+  </div>
+</div>
+    <h3>What are my chances??</h3>
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="progress">
+          <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">???</div>
+        </div>
+<!--
+        <div class="progress">
+          <div id="progress-bar-dt" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">???</div>
+        </div>
+        <div class="progress">
+          <div id="progress-bar-bbdt" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">???</div>
+        </div>
+-->
+      </div>
+      <div class="panel-footer">
+          URL: <span id="urlCalled"></span><br>
+          URL expl: <span id="urlCalledExpl"></span>
+      </div>
+    </div>
+
+</div>
+    </body>
+
+<html>
