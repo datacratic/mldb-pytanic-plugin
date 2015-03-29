@@ -96,7 +96,7 @@ for cls_algo in cls_algos:
                 "address": "cls_test_results_%s.beh.gz" % cls_algo
             },
             "where": "rowHash % 5 = 1",
-            "score": "APPLY BLOCK classifyBlock%s WITH (* EXCLUDING label) EXTRACT(score)" % cls_algo,
+            "score": "APPLY BLOCK classifyBlock%s WITH (* EXCLUDING (label)) EXTRACT(score)" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0"
         }
@@ -129,7 +129,7 @@ for cls_algo in cls_algos:
             "probabilizerUri": "probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
             #"select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
-            "select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING label) EXTRACT (score)",
+            "select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING (label)) EXTRACT (score)",
             "where": "rowHash() % 5 = 1",
             "label": "label = '1'",
         }
