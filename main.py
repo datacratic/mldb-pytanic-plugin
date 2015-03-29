@@ -53,7 +53,7 @@ dataset.commit()
 print "======= Train"
 for cls_algo in cls_algos:
     trainClassifierPipelineConfig = {
-        "id": "trainClsPipeline"+cls_algo,
+        "id": "titanic_cls_train_"+cls_algo,
         "type": "classifier",
         "params": {
             "dataset": { "id": "titanic" },
@@ -69,7 +69,7 @@ for cls_algo in cls_algos:
     print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s" % cls_algo,
             [["sync", "true"]], trainClassifierPipelineConfig)
     print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s/runs/1" % cls_algo,
-            [["sync", "true"]], {"id":"1"})
+            [["sync", "true"]], {})
 
 ######
 # test the classifier
@@ -86,7 +86,7 @@ for cls_algo in cls_algos:
             [["sync", "true"]], applyBlockConfig)
 
     testClassifierPipelineConfig = {
-        "id": "testClassifierPipeline",
+        "id": "titanic_cls_test_%s" % cls_algo,
         "type": "accuracy",
         "params": {
             "dataset": { "id": "titanic" },
@@ -105,7 +105,7 @@ for cls_algo in cls_algos:
             [["sync", "true"]], testClassifierPipelineConfig)
 
     print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s/runs/1" % cls_algo,
-            [["sync", "true"]], {"id":"1"})
+            [["sync", "true"]], {})
 
 
     explBlockConfig = {
@@ -122,7 +122,7 @@ for cls_algo in cls_algos:
 print "====== Train probabilizer"
 for cls_algo in cls_algos:
     trainProbabilizerPipelineConfig = {
-        "id": "trainProbabilizerPipeline"+cls_algo,
+        "id": "titanic_prob_train_%s" % cls_algo,
         "type": "probabilizer",
         "params": {
             "dataset": { "id": "titanic" },
@@ -139,7 +139,7 @@ for cls_algo in cls_algos:
                     [["sync", "true"]], trainProbabilizerPipelineConfig)
 
     print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s/runs/1" % cls_algo,
-                                      [["sync", "true"]], {"id":"1"})
+                                      [["sync", "true"]], {})
 
     probabilizerBlockConfig = {
         "id": "probabilizer" + cls_algo,
