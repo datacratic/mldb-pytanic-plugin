@@ -13,15 +13,15 @@ cls_algos = ["glz", "dt", "bbdt"]
 # cleanup in case things are already created
 print "======= Cleanup"
 for cls_algo in cls_algos:
-    print mldb.perform("DELETE", "/v1/datasets/titanic", [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_train_%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_test_%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/pipelines/titanic_prob_train_%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/blocks/classifyBlock%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/blocks/apply_probabilizer%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/blocks/probabilizer%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/blocks/explainBlock%s" % cls_algo, [["sync", "true"]], {})
-    print mldb.perform("DELETE", "/v1/blocks/probabilizer%s" % cls_algo, [["sync", "true"]], {})
+    print mldb.perform("DELETE", "/v1/datasets/titanic", [], {})
+    print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_train_%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_test_%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/pipelines/titanic_prob_train_%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/blocks/classifyBlock%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/blocks/apply_probabilizer%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/blocks/probabilizer%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/blocks/explainBlock%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/blocks/probabilizer%s" % cls_algo, [], {})
 
 
 
@@ -66,10 +66,8 @@ for cls_algo in cls_algos:
         }
     }
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s" % cls_algo,
-            [["sync", "true"]], trainClassifierPipelineConfig)
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s/runs/1" % cls_algo,
-            [["sync", "true"]], {})
+    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s" % cls_algo, [], trainClassifierPipelineConfig)
+    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s/runs/1" % cls_algo, [], {})
 
 ######
 # test the classifier
@@ -82,8 +80,7 @@ for cls_algo in cls_algos:
             "classifierUri": "titanic_%s.cls" % cls_algo
         }
     }
-    print mldb.perform("PUT", "/v1/blocks/classifyBlock%s" % cls_algo,
-            [["sync", "true"]], applyBlockConfig)
+    print mldb.perform("PUT", "/v1/blocks/classifyBlock%s" % cls_algo, [], applyBlockConfig)
 
     testClassifierPipelineConfig = {
         "id": "titanic_cls_test_%s" % cls_algo,
@@ -101,11 +98,9 @@ for cls_algo in cls_algos:
             "weight": "1.0"
         }
     }
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s" % cls_algo,
-            [["sync", "true"]], testClassifierPipelineConfig)
+    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s" % cls_algo, [], testClassifierPipelineConfig)
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s/runs/1" % cls_algo,
-            [["sync", "true"]], {})
+    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s/runs/1" % cls_algo, [], {})
 
 
     explBlockConfig = {
@@ -115,8 +110,7 @@ for cls_algo in cls_algos:
             "classifierUri": "titanic_%s.cls" % cls_algo
         }
     }
-    print mldb.perform("PUT", "/v1/blocks/explainBlock%s" % cls_algo,
-            [["sync", "true"]], explBlockConfig)
+    print mldb.perform("PUT", "/v1/blocks/explainBlock%s" % cls_algo, [], explBlockConfig)
 
 
 print "====== Train probabilizer"
@@ -135,11 +129,9 @@ for cls_algo in cls_algos:
         }
     };
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s" % cls_algo,
-                    [["sync", "true"]], trainProbabilizerPipelineConfig)
+    print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s" % cls_algo, [], trainProbabilizerPipelineConfig)
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s/runs/1" % cls_algo,
-                                      [["sync", "true"]], {})
+    print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s/runs/1" % cls_algo, [], {})
 
     probabilizerBlockConfig = {
         "id": "probabilizer" + cls_algo,
@@ -159,8 +151,7 @@ for cls_algo in cls_algos:
             ]
         }
     }
-    print mldb.perform("PUT", "/v1/blocks/"+probabilizerBlockConfig["id"],
-                        [["sync", "true"]], probabilizerBlockConfig)
+    print mldb.perform("PUT", "/v1/blocks/"+probabilizerBlockConfig["id"], [], probabilizerBlockConfig)
 
 # setup static routes
 mldb.plugin.serve_static_folder("/static", "static")
