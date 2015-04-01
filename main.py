@@ -181,4 +181,4 @@ def requestHandler(mldb, remaining, verb, resource, restParams, payload, content
 
 
 mldb.plugin.set_request_handler(requestHandler)
-
+mldb.plugin.serve_documentation_folder('doc')
