@@ -13,7 +13,8 @@ cls_algos = ["glz", "dt", "bbdt"]
 # cleanup in case things are already created
 print "======= Cleanup"
 for cls_algo in cls_algos:
-    print mldb.perform("DELETE", "/v1/datasets/titanic", [], {})
+    print mldb.perform("DELETE", "/v1/datasets/titanic-train", [], {})
+    print mldb.perform("DELETE", "/v1/datasets/titanic-test", [], {})
     print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_train_%s" % cls_algo, [], {})
     print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_test_%s" % cls_algo, [], {})
     print mldb.perform("DELETE", "/v1/pipelines/titanic_prob_train_%s" % cls_algo, [], {})
@@ -25,27 +26,28 @@ for cls_algo in cls_algos:
 
 
 
-# create a mutable beh dataset
-datasetConfig = {
-        "type": "mutable",
-        "id": "titanic",
-        "address": "titanic.beh.gz"
-    }
+# load the train and test datasets
+for dataset_type in ["train", "test"]:
+    datasetConfig = {
+            "type": "mutable",
+            "id": "titanic-"+dataset_type,
+        }
 
-dataset = mldb.create_dataset(datasetConfig)
+    dataset = mldb.create_dataset(datasetConfig)
+    def featProc(k, v):
+        if k=="Pclass": return "c"+v
+        if k=="Cabin": return v[0]
+        if k in ["Age", "SibSp", "Parch", "Fare"]: return float(v)
+        return v
 
-def featProc(k, v):
-    if k=="Pclass": return "c"+v
-    if k=="Cabin": return v[0]
-    return v
+    ts = datetime.datetime.now()
+    filename = mldb.plugin.get_plugin_dir() + "/titanic_%s.csv" % dataset_type
+    for idx, csvLine in enumerate(csv.DictReader(open(filename))):
+        tuples = [[k,featProc(k,v),ts] for k,v in csvLine.iteritems() if k != "PassengerId" and v!=""]
+        dataset.record_row(csvLine["PassengerId"], tuples)
 
-ts = datetime.datetime.now()
-for idx, csvLine in enumerate(csv.DictReader(open(mldb.plugin.get_plugin_dir() + "/titanic_train.csv"))):
-    tuples = [[k,featProc(k,v),ts] for k,v in csvLine.iteritems() if k != "PassengerId" and v!=""]
-    dataset.record_row(csvLine["PassengerId"], tuples)
-
-# commit the dataset
-dataset.commit()
+    # commit the dataset
+    dataset.commit()
 
 
 ######
@@ -56,7 +58,7 @@ for cls_algo in cls_algos:
         "id": "titanic_cls_train_"+cls_algo,
         "type": "classifier",
         "params": {
-            "dataset": { "id": "titanic" },
+            "dataset": { "id": "titanic-train" },
             "algorithm": cls_algo,
             "classifierUri": "titanic_%s.cls" % cls_algo,
             "label": "label = '1'",
@@ -86,11 +88,10 @@ for cls_algo in cls_algos:
         "id": "titanic_cls_test_%s" % cls_algo,
         "type": "accuracy",
         "params": {
-            "dataset": { "id": "titanic" },
+            "dataset": { "id": "titanic-train" },
             "output": {
                 "id": "cls_test_results_%s" % cls_algo,
                 "type": "mutable",
-                "address": "cls_test_results_%s.beh.gz" % cls_algo
             },
             "where": "rowHash % 5 = 1",
             "score": "APPLY BLOCK classifyBlock%s WITH (* EXCLUDING (label)) EXTRACT(score)" % cls_algo,
@@ -119,7 +120,7 @@ for cls_algo in cls_algos:
         "id": "titanic_prob_train_%s" % cls_algo,
         "type": "probabilizer",
         "params": {
-            "dataset": { "id": "titanic" },
+            "dataset": { "id": "titanic-train" },
             "probabilizerUri": "probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
             #"select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
