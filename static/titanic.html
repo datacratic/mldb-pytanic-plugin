@@ -56,18 +56,16 @@
 
         };
 
-        function updateSliderDisplay() {$(this).next().text($(this).val());}
-        
         // Update the prob is anything changes
         $("select").on("change", update);
         $("input").on("slide slideStop", function(){
-            updateSliderDisplay();
+            $(this).next().text($(this).val());
             update();
         });
         
         // update everything once on load
         update();
-        $("input").each(updateSliderDisplay)
+        $("input").each(function(){$(this).next().text($(this).val());})
     });
     </script>
     </head>
