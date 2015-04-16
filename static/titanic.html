@@ -95,9 +95,8 @@
         };
 
         // Update the prob is anything changes
-        $("form :input").change(function() {
-            update();
-        });
+        $("select").on("change", update);
+        $("input").on("slideStop", update);
 
         // update on load
         update();
