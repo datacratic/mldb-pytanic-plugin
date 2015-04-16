@@ -89,9 +89,20 @@
             <!-- <div class="col-xs-6 col-md-4 h4">Explain</div> -->
         </div>
         <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Classifier</div>
+            <div class="col-xs-6 col-md-4">
+                <select class="form-control" id="inputCls" name="Classifier" placeholder="Classifier" size="3">
+                  <option value="bbdt">bagged boosted decision tree</option>
+                  <option value="dt">decision tree</option>
+                  <option value="glz">glz</option>
+                </select> 
+            </div>
+            <div class="col-xs-6 col-md-4"></div>
+        </div>
+        <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Passenger class</div>
             <div class="col-xs-6 col-md-4">
-                <select class="form-control" name="Pclass" id="inputPclass" placeholder="PClass">
+                <select class="form-control" name="Pclass" id="inputPclass" placeholder="PClass" size="3">
                   <option value="c1">1st ~ Upper</option>
                   <option value="c2">2nd ~ Middle</option>
                   <option value="c3">3rd ~ Lower</option>
@@ -102,7 +113,7 @@
         <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Gender</div>
             <div class="col-xs-6 col-md-4">
-                <select class="form-control" name="Sex" id="inputSex" placeholder="Sex">
+                <select class="form-control" name="Sex" id="inputSex" placeholder="Sex" size="3">
                   <option value="male">Male</option>
                   <option value="female">Female</option>
                   <option value="nd">Don't specify</option>
@@ -110,6 +121,17 @@
             </div>
             <!-- <div class="col-xs-6 col-md-4" id="explainSex"></div> -->
         </div>
+        <div class="row">
+            <div class="col-xs-6 col-md-4 control-label">Port of Embarkation</div>
+            <div class="col-xs-6 col-md-4">
+                <select class="form-control" id="inputEmbarked" name="Embarked" placeholder="Embarked" size="4">
+                  <option value="C">Cherbourg</option>
+                  <option value="Q">Queenstown</option>
+                  <option value="S">Southampton</option>
+                  <option value="nd">Don't specify</option>
+                </select> 
+            </div>
+            <!-- <div class="col-xs-6 col-md-4" id="explainEmbarked"></div> -->
         <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Age</div>
             <div class="col-xs-6 col-md-4">
@@ -161,28 +183,6 @@
             </div>
         </div>
         -->
-        <div class="row">
-            <div class="col-xs-6 col-md-4 control-label">Port of Embarkation</div>
-            <div class="col-xs-6 col-md-4">
-                <select class="form-control" id="inputEmbarked" name="Embarked" placeholder="Embarked">
-                  <option value="C">Cherbourg</option>
-                  <option value="Q">Queenstown</option>
-                  <option value="S">Southampton</option>
-                  <option value="nd">Don't specify</option>
-                </select> 
-            </div>
-            <!-- <div class="col-xs-6 col-md-4" id="explainEmbarked"></div> -->
-        </div>
-        <div class="row">
-            <div class="col-xs-6 col-md-4 control-label">Classifier</div>
-            <div class="col-xs-6 col-md-4">
-                <select class="form-control" id="inputCls" name="Classifier" placeholder="Classifier">
-                  <option value="bbdt">bagged boosted decision tree</option>
-                  <option value="dt">decision tree</option>
-                  <option value="glz">glz</option>
-                </select> 
-            </div>
-            <div class="col-xs-6 col-md-4"></div>
         </div>
     </form>
   </div>
