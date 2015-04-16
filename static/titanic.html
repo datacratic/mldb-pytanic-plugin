@@ -56,14 +56,18 @@
 
         };
 
+        function updateSliderDisplay() {$(this).next().text($(this).val());}
+        
         // Update the prob is anything changes
         $("select").on("change", update);
         $("input").on("slide slideStop", function(){
-            $(this).next().text($(this).val());
+            updateSliderDisplay();
             update();
         });
-        // update on load
+        
+        // update everything once on load
         update();
+        $("input").each(updateSliderDisplay)
     });
     </script>
     </head>
@@ -111,7 +115,9 @@
         <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Age</div>
             <div class="col-xs-6 col-md-4">
-                <input type="text" name="Age" id="inputAge" placeholder="0.419 to 80" data-slider-id='ex1Slider' data-slider-min="1" data-slider-max="90" data-slider-step="1" data-slider-value="35">
+                <input type="text" name="Age" id="inputAge" placeholder="0.419 to 80" 
+                    data-slider-id='ex1Slider' data-slider-min="1" data-slider-max="90" 
+                    data-slider-step="1" data-slider-value="35" data-slider-tooltip="hide">
                 <span style="margin-left: 15px"></span>
             </div>
             <!-- <div class="col-xs-6 col-md-4" id="explainAge"></div>-->
@@ -120,7 +126,9 @@
             <div class="col-xs-6 col-md-4 control-label">
             Number of Siblings/Spouses Aboard</div>
             <div class="col-xs-6 col-md-4">
-                <input type="text" class="form-control" name="SibSp" id="inputSibSp" placeholder="0 to 8" data-slider-id='ex2Slider' data-slider-min="0" data-slider-max="10" data-slider-step="1" data-slider-value="1">
+                <input type="text" class="form-control" name="SibSp" id="inputSibSp" placeholder="0 to 8" 
+                    data-slider-id='ex2Slider' data-slider-min="0" data-slider-max="10" 
+                    data-slider-step="1" data-slider-value="1" data-slider-tooltip="hide">
                 <span style="margin-left: 15px"></span>
             </div>
             <!-- <div class="col-xs-6 col-md-4" id="explainSibSp"></div> -->
@@ -128,7 +136,9 @@
         <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Number of Parents/Children Aboard</div>
             <div class="col-xs-6 col-md-4">
-                <input type="text" class="form-control" name="Parch" id="inputParc" placeholder="0 to 6" data-slider-id='ex3Slider' data-slider-min="0" data-slider-max="6" data-slider-step="1" data-slider-value="0">
+                <input type="text" class="form-control" name="Parch" id="inputParc" placeholder="0 to 6" 
+                    data-slider-id='ex3Slider' data-slider-min="0" data-slider-max="6" 
+                    data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide">
                 <span style="margin-left: 15px"></span>
             
             </div>
@@ -137,7 +147,9 @@
         <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Fare</div>
             <div class="col-xs-6 col-md-4">
-                <input type="text" class="form-control" name="Fare" id="inputFare" placeholder="0 to 512$" data-slider-id='ex4Slider' data-slider-min="0" data-slider-max="515" data-slider-step="1" data-slider-value="32">
+                <input type="text" class="form-control" name="Fare" id="inputFare" placeholder="0 to 512$" 
+                    data-slider-id='ex4Slider' data-slider-min="0" data-slider-max="515" 
+                    data-slider-step="1" data-slider-value="32" data-slider-tooltip="hide">
                 <span style="margin-left: 15px"></span>
             </div>
             <!-- <div class="col-xs-6 col-md-4" id="explainFare"></div> -->
