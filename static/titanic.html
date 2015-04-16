@@ -39,7 +39,6 @@
         }
 
         var cls = $('#inputCls').val();
-        if(true) {
         var url = "http://"+window.location.host+"/v1/blocks/probabilizer"+cls+"/application?"+formVals2;
         $("#urlCalled").text(url);
         $.ajax({
@@ -54,49 +53,13 @@
                 $('.progress-bar').text(score.toFixed(2)+"%");
             }
         });
-        }
 
-        if(false) {
-        var url = "http://"+window.location.host+"/v1/plugins/pytanic/routes/multiApply?"+formVals;
-        $("#urlCalled").text(url);
-        $.ajax({
-            url: url,
-            dataType: "json",
-            error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.status + textStatus);
-                  },
-            success: function(data) {
-                for(var cls in data) {
-                    var score = parseFloat(data[cls]) * 100;
-                    $('.progress-bar-'+cls).css('width', score+'%').attr('aria-valuenow', score);
-                    $('.progress-bar-'+cls).text(score.toFixed(2)+"%");
-                }
-            }
-        });
-        }
-
-        /*
-        var urlExpl = "http://"+window.location.host+"/v1/blocks/explainBlock"+cls+"/application?"+formVals;
-        $("#urlCalledExpl").text(urlExpl);
-        $.ajax({
-            url: urlExpl,
-            dataType: "json",
-            error: function (jqXHR, textStatus, errorThrown) {
-                    alert(jqXHR.status + textStatus);
-                  },
-            success: function(data) {
-            for(var feature in data.pins) {
-                var sf = feature.split(":");
-                    $('#explain'+sf[1]).text(data.pins[feature]);
-                }
-            }
-        });
-        */
         };
 
         // Update the prob is anything changes
         $("select").on("change", update);
         $("input").on("slideStop", update);
+        $("input").on("slide", update);
 
         // update on load
         update();
