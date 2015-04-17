@@ -156,21 +156,4 @@ for cls_algo in cls_algos:
 
 # setup static routes
 mldb.plugin.serve_static_folder("/static", "static")
-
-def requestHandler(mldb, remaining, verb, resource, restParams, payload, contentType, contentLength, headers):
-    global cls_algos
-    print "Handling route in python"
-    import json
-    if verb == "GET" and remaining == "/multiApply":
-        rez_accum = {}
-        for algo in cls_algos:
-            rez = mldb.perform("GET", "/v1/blocks/probabilizer"+algo+"/application", restParams, "{}")
-
-            response = json.loads(rez["response"])
-            rez_accum[algo] = response["pins"]["prob"]
-
-        return rez_accum
-
-
-mldb.plugin.set_request_handler(requestHandler)
 mldb.plugin.serve_documentation_folder('doc')
