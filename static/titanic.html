@@ -13,7 +13,7 @@
     <script type="text/javascript">
     $(function() {
 
-        ["#inputAge", "#inputSibSp", "#inputParc", "#inputFare"].forEach(function(e) {
+        ["#inputAge", "#inputSibSp", "#inputParch", "#inputFare"].forEach(function(e) {
             $(e).slider({
                 formatter: function(value) {
                     return 'Current value: ' + value;
@@ -22,27 +22,22 @@
         });
 
         var update = function() {
-        var formVals = $("#oddsForm").serialize();
-
-        // do a little bit of reshuffling to encode the example properly
-        var formVals2="encoding=json";
-        var floatVals = ["Age", "SibSp", "Parch", "Fare"];
-        var splitFormVals = formVals.split("&");
-        for(var i in splitFormVals) {
-            var split_elem = splitFormVals[i].split("=");
-            formVals2 += "&" + split_elem[0] + "=";
-            if(floatVals.indexOf(split_elem[0]) != -1) {
-                formVals2 += split_elem[1]
-            } else {
-                formVals2 += '"'+split_elem[1]+'"'
-            }
-        }
 
         var cls = $('input[name=Classifier]:checked').val();
-        var url = "http://"+window.location.host+"/v1/blocks/probabilizer"+cls+"/application?"+formVals2;
-        $("#urlCalled").text(url);
+
+        var feature_vector = {
+            "Pclass": $('input[name=Pclass]:checked').val(),
+            "Sex": $('input[name=Sex]:checked').val(),
+            "Embarked": $('input[name=Embarked]:checked').val(),
+            "Age": parseFloat($('#inputAge').val()),
+            "SibSp": parseFloat($('#inputSibSp').val()),
+            "Parch": parseFloat($('#inputParch').val()),
+            "Fare": parseFloat($('#inputFare').val())
+        };
+
         $.ajax({
-            url: url,
+            url: "/v1/blocks/probabilizer"+cls+"/application",
+            data: {input: JSON.stringify(feature_vector)},
             dataType: "json",
             error: function (jqXHR, textStatus, errorThrown) {
                     alert(jqXHR.status + textStatus);
@@ -78,6 +73,16 @@
               <p><img src="titanic.jpg"></p>
       </div>
 
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">What are my chances??</h3>
+      </div>
+      <div class="panel-body">
+        <div class="progress">
+          <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">???</div>
+        </div>
+      </div>
+    </div>
 <div class="panel panel-default">
   <div class="panel-heading">
     <h3 class="panel-title">Passenger information</h3>
@@ -166,7 +171,7 @@
         <div class="row">
             <div class="col-xs-6 col-md-4 control-label">Number of Parents/Children Aboard</div>
             <div class="col-xs-6 col-md-4">
-                <input type="text" class="form-control" name="Parch" id="inputParc" placeholder="0 to 6" 
+                <input type="text" class="form-control" name="Parch" id="inputParch" placeholder="0 to 6" 
                     data-slider-id='ex3Slider' data-slider-min="0" data-slider-max="6" 
                     data-slider-step="1" data-slider-value="0" data-slider-tooltip="hide">
                 <span style="margin-left: 15px"></span>
@@ -186,17 +191,6 @@
     </form>
   </div>
 </div>
-    <h3>What are my chances??</h3>
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="progress">
-          <div id="progress-bar" class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 50%;">???</div>
-        </div>
-      </div>
-      <div class="panel-footer">
-          URL: <span id="urlCalled"></span><br>
-      </div>
-    </div>
 
 </div>
     </body>
