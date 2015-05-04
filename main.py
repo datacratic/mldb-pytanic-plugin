@@ -60,7 +60,7 @@ for cls_algo in cls_algos:
         "params": {
             "dataset": { "id": "titanic-train" },
             "algorithm": cls_algo,
-            "classifierUri": "titanic_%s.cls" % cls_algo,
+            "classifierModelUri": "file://titanic_%s.cls" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0",
             "where": "rowHash % 5 != 1",
@@ -79,7 +79,7 @@ for cls_algo in cls_algos:
         "id": "classifyBlock" + cls_algo,
         "type": "classifier.apply",
         "params": {
-            "classifierUri": "titanic_%s.cls" % cls_algo
+            "classifierModelUri": "file://titanic_%s.cls" % cls_algo
         }
     }
     print mldb.perform("PUT", "/v1/blocks/classifyBlock%s" % cls_algo, [], applyBlockConfig)
@@ -108,7 +108,7 @@ for cls_algo in cls_algos:
         "id": "explainBlock" + cls_algo,
         "type": "classifier.explain",
         "params": {
-            "classifierUri": "titanic_%s.cls" % cls_algo
+            "classifierModelUri": "file://titanic_%s.cls" % cls_algo
         }
     }
     print mldb.perform("PUT", "/v1/blocks/explainBlock%s" % cls_algo, [], explBlockConfig)
@@ -121,7 +121,7 @@ for cls_algo in cls_algos:
         "type": "probabilizer",
         "params": {
             "dataset": { "id": "titanic-train" },
-            "probabilizerUri": "probabilizer"+cls_algo+".json",
+            "probabilizerModelUri": "file://probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
             #"select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
             "select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING (label)) EXTRACT (score)",
@@ -146,7 +146,7 @@ for cls_algo in cls_algos:
                     "id": "apply_probabilizer"+cls_algo,
                     "type": "probabilizer.apply",
                     "params": {
-                        "probabilizerUri": "probabilizer"+cls_algo+".json"
+                        "probabilizerModelUri": "file://probabilizer"+cls_algo+".json"
                     }
                 }
             ]
