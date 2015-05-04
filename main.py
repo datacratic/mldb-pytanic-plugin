@@ -89,7 +89,7 @@ for cls_algo in cls_algos:
         "type": "accuracy",
         "params": {
             "dataset": { "id": "titanic-train" },
-            "output": { "id": "cls_test_results_%s" % cls_algo, "type": "mutable" },
+            "output": { "id": "cls_test_results_%s" % cls_algo, "type": "beh_mutable" },
             "where": "rowHash % 5 = 1",
             "score": "APPLY BLOCK classifyBlock%s WITH (* EXCLUDING (label)) EXTRACT(score)" % cls_algo,
             "label": "label = '1'",
