@@ -63,7 +63,7 @@ for cls_algo in cls_algos:
             "classifierModelUri": "file://titanic_%s.cls" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0",
-            "where": "rowHash % 5 != 1",
+            "where": "rowHash() % 5 != 1",
             "select": "* EXCLUDING (Ticket, Name, label, Cabin)"
         }
     }
@@ -90,7 +90,7 @@ for cls_algo in cls_algos:
         "params": {
             "dataset": { "id": "titanic-train" },
             "output": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
-            "where": "rowHash % 5 = 1",
+            "where": "rowHash() % 5 = 1",
             "score": "APPLY BLOCK classifyBlock%s WITH (object(SELECT * EXCLUDING (label)) AS features) EXTRACT(score)" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0"
