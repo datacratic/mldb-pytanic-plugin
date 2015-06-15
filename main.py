@@ -60,6 +60,38 @@ for cls_algo in cls_algos:
         "params": {
             "dataset": { "id": "titanic-train" },
             "algorithm": cls_algo,
+            "configuration": {
+                "bbdt": {
+                    "type": "bagging",
+                    "verbosity": 3,
+                    "weak_learner": {
+                        "type": "boosting",
+                        "verbosity": 3,
+                        "weak_learner": {
+                            "type": "decision_tree",
+                            "max_depth": 3,
+                            "verbosity": 0,
+                            "update_alg": "gentle",
+                            "random_feature_propn": 0.5
+                        },
+                        "min_iter": 5,
+                        "max_iter": 30
+                    },
+                    "num_bags": 5
+                },
+                "dt": {
+                    "type": "decision_tree",
+                    "max_depth": 8,
+                    "verbosity": 3,
+                    "update_alg": "prob"
+                },
+                "glz": {
+                    "type": "glz",
+                    "verbosity": 3,
+                    "normalize ": " true",
+                    "ridge_regression ": " true"
+                }
+            },
             "classifierModelUri": "file://models/titanic_%s.cls" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0",
