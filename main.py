@@ -15,14 +15,14 @@ print "======= Cleanup"
 for cls_algo in cls_algos:
     print mldb.perform("DELETE", "/v1/datasets/titanic-train", [], {})
     print mldb.perform("DELETE", "/v1/datasets/titanic-test", [], {})
-    print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_train_%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/pipelines/titanic_cls_test_%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/pipelines/titanic_prob_train_%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/blocks/classifyBlock%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/blocks/apply_probabilizer%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/blocks/probabilizer%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/blocks/explainBlock%s" % cls_algo, [], {})
-    print mldb.perform("DELETE", "/v1/blocks/probabilizer%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/procedures/titanic_cls_train_%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/procedures/titanic_cls_test_%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/procedures/titanic_prob_train_%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/functions/classifyFunction%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/functions/apply_probabilizer%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/functions/probabilizer%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/functions/explainFunction%s" % cls_algo, [], {})
+    print mldb.perform("DELETE", "/v1/functions/probabilizer%s" % cls_algo, [], {})
 
 
 
@@ -54,7 +54,7 @@ for dataset_type in ["train", "test"]:
 # train a classifier
 print "======= Train"
 for cls_algo in cls_algos:
-    trainClassifierPipelineConfig = {
+    trainClassifierProcedureConfig = {
         "id": "titanic_cls_train_"+cls_algo,
         "type": "classifier",
         "params": {
@@ -100,76 +100,76 @@ for cls_algo in cls_algos:
         }
     }
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s" % cls_algo, [], trainClassifierPipelineConfig)
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_train_%s/runs/1" % cls_algo, [], {})
+    print mldb.perform("PUT", "/v1/procedures/titanic_cls_train_%s" % cls_algo, [], trainClassifierProcedureConfig)
+    print mldb.perform("PUT", "/v1/procedures/titanic_cls_train_%s/runs/1" % cls_algo, [], {})
 
 ######
 # test the classifier
 print "======= Test"
 for cls_algo in cls_algos:
-    applyBlockConfig = {
-        "id": "classifyBlock" + cls_algo,
+    applyFunctionConfig = {
+        "id": "classifyFunction" + cls_algo,
         "type": "classifier.apply",
         "params": {
             "classifierModelUri": "file://models/titanic_%s.cls" % cls_algo
         }
     }
-    print mldb.perform("PUT", "/v1/blocks/classifyBlock%s" % cls_algo, [], applyBlockConfig)
+    print mldb.perform("PUT", "/v1/functions/classifyFunction%s" % cls_algo, [], applyFunctionConfig)
 
-    testClassifierPipelineConfig = {
+    testClassifierProcedureConfig = {
         "id": "titanic_cls_test_%s" % cls_algo,
         "type": "accuracy",
         "params": {
             "dataset": { "id": "titanic-train" },
             "output": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
             "where": "rowHash() % 5 = 1",
-            "score": "APPLY BLOCK classifyBlock%s WITH (object(SELECT * EXCLUDING (label)) AS features) EXTRACT(score)" % cls_algo,
+            "score": "APPLY FUNCTION classifyFunction%s WITH (object(SELECT * EXCLUDING (label)) AS features) EXTRACT(score)" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0"
         }
     }
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s" % cls_algo, [], testClassifierPipelineConfig)
+    print mldb.perform("PUT", "/v1/procedures/titanic_cls_test_%s" % cls_algo, [], testClassifierProcedureConfig)
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_cls_test_%s/runs/1" % cls_algo, [], {})
+    print mldb.perform("PUT", "/v1/procedures/titanic_cls_test_%s/runs/1" % cls_algo, [], {})
 
 
-    explBlockConfig = {
-        "id": "explainBlock" + cls_algo,
+    explFunctionConfig = {
+        "id": "explainFunction" + cls_algo,
         "type": "classifier.explain",
         "params": {
             "classifierModelUri": "file://models/titanic_%s.cls" % cls_algo
         }
     }
-    print mldb.perform("PUT", "/v1/blocks/explainBlock%s" % cls_algo, [], explBlockConfig)
+    print mldb.perform("PUT", "/v1/functions/explainFunction%s" % cls_algo, [], explFunctionConfig)
 
 
 print "====== Train probabilizer"
 for cls_algo in cls_algos:
-    trainProbabilizerPipelineConfig = {
+    trainProbabilizerProcedureConfig = {
         "id": "titanic_prob_train_%s" % cls_algo,
         "type": "probabilizer",
         "params": {
             "dataset": { "id": "titanic-train" },
             "probabilizerModelUri": "file://models/probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
-            #"select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
-            "select": "APPLY BLOCK classifyBlock"+cls_algo+" WITH (object(SELECT * EXCLUDING (label)) AS features) EXTRACT (score)",
+            #"select": "APPLY FUNCTION classifyFunction"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
+            "select": "APPLY FUNCTION classifyFunction"+cls_algo+" WITH (object(SELECT * EXCLUDING (label)) AS features) EXTRACT (score)",
             "where": "rowHash() % 5 = 1",
             "label": "label = '1'",
         }
     };
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s" % cls_algo, [], trainProbabilizerPipelineConfig)
+    print mldb.perform("PUT", "/v1/procedures/titanic_prob_train_%s" % cls_algo, [], trainProbabilizerProcedureConfig)
 
-    print mldb.perform("PUT", "/v1/pipelines/titanic_prob_train_%s/runs/1" % cls_algo, [], {})
+    print mldb.perform("PUT", "/v1/procedures/titanic_prob_train_%s/runs/1" % cls_algo, [], {})
 
-    probabilizerBlockConfig = {
+    probabilizerFunctionConfig = {
         "id": "probabilizer" + cls_algo,
         "type": "serial",
         "params": {
             "steps": [
                 {
-                    "id": "classifyBlock" + cls_algo
+                    "id": "classifyFunction" + cls_algo
                 },
                 {
                     "id": "apply_probabilizer"+cls_algo,
@@ -181,7 +181,7 @@ for cls_algo in cls_algos:
             ]
         }
     }
-    print mldb.perform("PUT", "/v1/blocks/"+probabilizerBlockConfig["id"], [], probabilizerBlockConfig)
+    print mldb.perform("PUT", "/v1/functions/"+probabilizerFunctionConfig["id"], [], probabilizerFunctionConfig)
 
 # setup static routes
 mldb.plugin.serve_static_folder("/static", "static")
