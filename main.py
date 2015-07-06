@@ -56,7 +56,7 @@ print "======= Train"
 for cls_algo in cls_algos:
     trainClassifierProcedureConfig = {
         "id": "titanic_cls_train_"+cls_algo,
-        "type": "classifier",
+        "type": "classifier.train",
         "params": {
             "dataset": { "id": "titanic-train" },
             "algorithm": cls_algo,
@@ -109,7 +109,7 @@ print "======= Test"
 for cls_algo in cls_algos:
     applyFunctionConfig = {
         "id": "classifyFunction" + cls_algo,
-        "type": "classifier.apply",
+        "type": "classifier",
         "params": {
             "classifierModelUri": "file://models/titanic_%s.cls" % cls_algo
         }
@@ -118,7 +118,7 @@ for cls_algo in cls_algos:
 
     testClassifierProcedureConfig = {
         "id": "titanic_cls_test_%s" % cls_algo,
-        "type": "accuracy",
+        "type": "classifier.test",
         "params": {
             "dataset": { "id": "titanic-train" },
             "output": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
@@ -147,7 +147,7 @@ print "====== Train probabilizer"
 for cls_algo in cls_algos:
     trainProbabilizerProcedureConfig = {
         "id": "titanic_prob_train_%s" % cls_algo,
-        "type": "probabilizer",
+        "type": "probabilizer.train",
         "params": {
             "dataset": { "id": "titanic-train" },
             "probabilizerModelUri": "file://models/probabilizer"+cls_algo+".json",
@@ -173,7 +173,7 @@ for cls_algo in cls_algos:
                 },
                 {
                     "id": "apply_probabilizer"+cls_algo,
-                    "type": "probabilizer.apply",
+                    "type": "probabilizer",
                     "params": {
                         "probabilizerModelUri": "file://models/probabilizer"+cls_algo+".json"
                     }
