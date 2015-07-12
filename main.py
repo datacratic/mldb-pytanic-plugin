@@ -92,7 +92,7 @@ for cls_algo in cls_algos:
                     "ridge_regression ": " true"
                 }
             },
-            "modelFileUri": "file://models/titanic_%s.cls" % cls_algo,
+            "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0",
             "where": "rowHash() % 5 != 1",
@@ -111,7 +111,7 @@ for cls_algo in cls_algos:
         "id": "classifyFunction" + cls_algo,
         "type": "classifier",
         "params": {
-            "modelFileUri": "file://models/titanic_%s.cls" % cls_algo
+            "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo
         }
     }
     print mldb.perform("PUT", "/v1/functions/classifyFunction%s" % cls_algo, [], applyFunctionConfig)
@@ -137,7 +137,7 @@ for cls_algo in cls_algos:
         "id": "explainFunction" + cls_algo,
         "type": "classifier.explain",
         "params": {
-            "modelFileUri": "file://models/titanic_%s.cls" % cls_algo
+            "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo
         }
     }
     print mldb.perform("PUT", "/v1/functions/explainFunction%s" % cls_algo, [], explFunctionConfig)
@@ -150,7 +150,7 @@ for cls_algo in cls_algos:
         "type": "probabilizer.train",
         "params": {
             "dataset": { "id": "titanic-train" },
-            "modelFileUri": "file://models/probabilizer"+cls_algo+".json",
+            "modelFileUrl": "file://models/probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
             #"select": "APPLY FUNCTION classifyFunction"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
             "select": "APPLY FUNCTION classifyFunction"+cls_algo+" WITH (object(SELECT * EXCLUDING (label)) AS features) EXTRACT (score)",
@@ -175,7 +175,7 @@ for cls_algo in cls_algos:
                     "id": "apply_probabilizer"+cls_algo,
                     "type": "probabilizer",
                     "params": {
-                        "modelFileUri": "file://models/probabilizer"+cls_algo+".json"
+                        "modelFileUrl": "file://models/probabilizer"+cls_algo+".json"
                     }
                 }
             ]
