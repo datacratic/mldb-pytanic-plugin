@@ -123,7 +123,7 @@ for cls_algo in cls_algos:
             "dataset": { "id": "titanic-train" },
             "output": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
             "where": "rowHash() % 5 = 1",
-            "score": "APPLY FUNCTION classifyFunction%s WITH ( {* EXCLUDING (label)} AS features) EXTRACT(score)" % cls_algo,
+            "score": "@classifyFunction%s( {* EXCLUDING (label)} AS features)[score]" % cls_algo,
             "label": "label = '1'",
             "weight": "1.0"
         }
@@ -152,8 +152,8 @@ for cls_algo in cls_algos:
             "dataset": { "id": "titanic-train" },
             "modelFileUrl": "file://models/probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
-            #"select": "APPLY FUNCTION classifyFunction"+cls_algo+" WITH (* EXCLUDING Ticket, Name, label, Cabin) EXTRACT (score)",
-            "select": "APPLY FUNCTION classifyFunction"+cls_algo+" WITH ( {* EXCLUDING (label)} AS features) EXTRACT (score)",
+            #"select": "@classifyFunction"+cls_algo+"(* EXCLUDING Ticket, Name, label, Cabin)[score]",
+            "select": "@classifyFunction"+cls_algo+"( {* EXCLUDING (label)} AS features)[(score)]",
             "where": "rowHash() % 5 = 1",
             "label": "label = '1'",
         }
