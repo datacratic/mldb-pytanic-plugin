@@ -43,7 +43,7 @@
                     alert(jqXHR.status + textStatus);
                   },
             success: function(data) {
-                var score = parseFloat(data.pins.prob) * 100;
+                var score = parseFloat(data.output.prob) * 100;
                 $('.progress-bar').css('width', score+'%').attr('aria-valuenow', score);
                 $('.progress-bar').text(score.toFixed(2)+"%");
             }
