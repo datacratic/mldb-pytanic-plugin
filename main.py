@@ -58,7 +58,7 @@ for cls_algo in cls_algos:
         "id": "titanic_cls_train_"+cls_algo,
         "type": "classifier.train",
         "params": {
-            "dataset": { "id": "titanic-train" },
+            "trainingDataset": { "id": "titanic-train" },
             "algorithm": cls_algo,
             "configuration": {
                 "bbdt": {
@@ -120,8 +120,8 @@ for cls_algo in cls_algos:
         "id": "titanic_cls_test_%s" % cls_algo,
         "type": "classifier.test",
         "params": {
-            "dataset": { "id": "titanic-train" },
-            "output": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
+            "testingDataset": { "id": "titanic-train" },
+            "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
             "where": "rowHash() % 5 = 1",
             "score": "classifyFunction%s({ {* EXCLUDING (label)} AS features})[score]" % cls_algo,
             "label": "label = '1'",
@@ -149,7 +149,7 @@ for cls_algo in cls_algos:
         "id": "titanic_prob_train_%s" % cls_algo,
         "type": "probabilizer.train",
         "params": {
-            "dataset": { "id": "titanic-train" },
+            "trainingDataset": { "id": "titanic-train" },
             "modelFileUrl": "file://models/probabilizer"+cls_algo+".json",
             # MAKES THIS FAIL!!
             #"select": "classifyFunction"+cls_algo+"({* EXCLUDING Ticket, Name, label, Cabin})[score]",
