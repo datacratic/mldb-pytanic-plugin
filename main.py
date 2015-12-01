@@ -29,7 +29,7 @@ for cls_algo in cls_algos:
 # load the train and test datasets
 for dataset_type in ["train", "test"]:
     datasetConfig = {
-            "type": "beh.mutable",
+            "type": "sparse.mutable",
             "id": "titanic-"+dataset_type,
         }
 
@@ -121,7 +121,7 @@ for cls_algo in cls_algos:
         "type": "classifier.test",
         "params": {
             "testingDataset": { "id": "titanic-train" },
-            "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "beh.mutable" },
+            "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "sparse.mutable" },
             "where": "rowHash() % 5 = 1",
             "score": "classifyFunction%s({ {* EXCLUDING (label)} AS features})[score]" % cls_algo,
             "label": "label = '1'",
