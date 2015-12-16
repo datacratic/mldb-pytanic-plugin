@@ -58,7 +58,11 @@ for cls_algo in cls_algos:
         "id": "titanic_cls_train_"+cls_algo,
         "type": "classifier.train",
         "params": {
-            "trainingDataset": { "id": "titanic-train" },
+            "trainingData": { 
+                "select" : "{* EXCLUDING (Ticket, Name, label, Cabin)} as features, label = '1' as label",
+                "from" : { "id": "titanic-train" },
+                "where": "rowHash() % 5 != 1"
+            },
             "algorithm": cls_algo,
             "configuration": {
                 "bbdt": {
@@ -93,10 +97,7 @@ for cls_algo in cls_algos:
                 }
             },
             "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo,
-            "label": "label = '1'",
-            "weight": "1.0",
-            "where": "rowHash() % 5 != 1",
-            "select": "* EXCLUDING (Ticket, Name, label, Cabin)"
+            "weight": "1.0"
         }
     }
 
@@ -120,11 +121,13 @@ for cls_algo in cls_algos:
         "id": "titanic_cls_test_%s" % cls_algo,
         "type": "classifier.test",
         "params": {
-            "testingDataset": { "id": "titanic-train" },
+            "testingData": { 
+                "select": "{*} as features, label = '1' as label",
+                "from": {"id": "titanic-train" },
+                "where": "rowHash() % 5 = 1"
+            }                
             "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "sparse.mutable" },
-            "where": "rowHash() % 5 = 1",
             "score": "classifyFunction%s({ {* EXCLUDING (label)} AS features})[score]" % cls_algo,
-            "label": "label = '1'",
             "weight": "1.0"
         }
     }
