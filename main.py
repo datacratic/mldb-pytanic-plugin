@@ -125,7 +125,7 @@ for cls_algo in cls_algos:
                 "select": "{*} as features, label = '1' as label",
                 "from": {"id": "titanic-train" },
                 "where": "rowHash() % 5 = 1"
-            }                
+            },            
             "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "sparse.mutable" },
             "score": "classifyFunction%s({ {* EXCLUDING (label)} AS features})[score]" % cls_algo,
             "weight": "1.0"
