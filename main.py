@@ -152,13 +152,14 @@ for cls_algo in cls_algos:
         "id": "titanic_prob_train_%s" % cls_algo,
         "type": "probabilizer.train",
         "params": {
-            "trainingDataset": { "id": "titanic-train" },
+            "trainingData": { 
+                # MAKES THIS FAIL!!
+                #"select": "classifyFunction"+cls_algo+"({* EXCLUDING Ticket, Name, label, Cabin})[score]",
+                "select": "classifyFunction"+cls_algo+"( {{* EXCLUDING (label)} AS features})[(score)] as score, label = '1' as label",
+                "from": { "id": "titanic-train" },
+                "where": "rowHash() % 5 = 1"
+            },
             "modelFileUrl": "file://models/probabilizer"+cls_algo+".json",
-            # MAKES THIS FAIL!!
-            #"select": "classifyFunction"+cls_algo+"({* EXCLUDING Ticket, Name, label, Cabin})[score]",
-            "select": "classifyFunction"+cls_algo+"( {{* EXCLUDING (label)} AS features})[(score)]",
-            "where": "rowHash() % 5 = 1",
-            "label": "label = '1'",
         }
     };
 
