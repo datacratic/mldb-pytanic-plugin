@@ -96,8 +96,7 @@ for cls_algo in cls_algos:
                     "ridge_regression ": " true"
                 }
             },
-            "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo,
-            "weight": "1.0"
+            "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo
         }
     }
 
@@ -122,13 +121,11 @@ for cls_algo in cls_algos:
         "type": "classifier.test",
         "params": {
             "testingData": { 
-                "select": "{*} as features, label = '1' as label",
+                "select": "label = '1' as label, classifyFunction%s({ {* EXCLUDING (label)} AS features})[score] as score" % cls_algo,
                 "from": {"id": "titanic-train" },
                 "where": "rowHash() % 5 = 1"
             },            
-            "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "sparse.mutable" },
-            "score": "classifyFunction%s({ {* EXCLUDING (label)} AS features})[score]" % cls_algo,
-            "weight": "1.0"
+            "outputDataset": { "id": "cls_test_results_%s" % cls_algo, "type": "sparse.mutable" }
         }
     }
     print mldb.perform("PUT", "/v1/procedures/titanic_cls_test_%s" % cls_algo, [], testClassifierProcedureConfig)
