@@ -36,7 +36,7 @@
         };
 
         $.ajax({
-            url: "/v1/functions/probabilizer"+cls+"/application",
+            url: "../../../functions/probabilizer"+cls+"/application",
             data: {input: JSON.stringify({features: feature_vector})},
             dataType: "json",
             error: function (jqXHR, textStatus, errorThrown) {
