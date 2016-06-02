@@ -24,7 +24,7 @@ for cls_algo in ["glz", "dt", "bbdt"]:
         "type": "classifier.train",
         "params": {
             "trainingData": { 
-                "select" : "{* EXCLUDING (Ticket, Name, label, Cabin)} as features, label = '1' as label",
+                "select" : "{Sex, Age, Fare, Embarked, Parch, SibSp, Pclass} as features, label = '1' as label",
                 "from" : { "id": "titanic-train" },
                 "where": "rowHash() % 5 != 1"
             },
@@ -39,7 +39,7 @@ for cls_algo in ["glz", "dt", "bbdt"]:
         "type": "probabilizer.train",
         "params": {
             "trainingData": { 
-                "select": "classifyFunction"+cls_algo+"( {{* EXCLUDING (label)} AS features})[(score)] as score, label = '1' as label",
+                "select": "classifyFunction"+cls_algo+"( {{Sex, Age, Fare, Embarked, Parch, SibSp, Pclass} AS features})[score] as score, label = '1' as label",
                 "from": { "id": "titanic-train" },
                 "where": "rowHash() % 5 = 1"
             },
