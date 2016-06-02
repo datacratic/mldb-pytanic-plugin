@@ -26,7 +26,7 @@
         var cls = $('input[name=Classifier]:checked').val();
 
         var feature_vector = {
-            "Pclass": $('input[name=Pclass]:checked').val(),
+            "Pclass": parseFloat($('input[name=Pclass]:checked').val()),
             "Sex": $('input[name=Sex]:checked').val(),
             "Embarked": $('input[name=Embarked]:checked').val(),
             "Age": parseFloat($('#inputAge').val()),
@@ -107,13 +107,13 @@
             <div class="col-xs-6 col-md-4 control-label">Passenger class</div>
             <div class="col-xs-6 col-md-6 radio">
                 <label>
-                    <input type="radio" name="Pclass" value="c1" checked> 1st ~ Upper
+                    <input type="radio" name="Pclass" value="1" checked> 1st ~ Upper
                 </label>&nbsp; &nbsp;
                 <label>
-                    <input type="radio" name="Pclass" value="c2"> 2nd ~ Middle
+                    <input type="radio" name="Pclass" value="2"> 2nd ~ Middle
                 </label>&nbsp; &nbsp;
                 <label>
-                    <input type="radio" name="Pclass" value="c3"> 3rd ~ Lower
+                    <input type="radio" name="Pclass" value="3"> 3rd ~ Lower
                 </label>
 
             </div>
