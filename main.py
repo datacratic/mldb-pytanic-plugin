@@ -9,6 +9,9 @@ import csv, datetime, json
 mldb.log("Pytanic Plugin Executing setup...")
 
 
+print mldb.perform("DELETE", "/v1/datasets/titanic-train", [], {})
+print mldb.perform("DELETE", "/v1/datasets/titanic-test", [], {})
+
 # load the train and test datasets
 for dataset_type in ["train", "test"]:
     datasetConfig = {
