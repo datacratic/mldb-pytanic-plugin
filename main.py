@@ -9,14 +9,27 @@ import csv, datetime, json
 mldb.log("Pytanic Plugin Executing setup...")
 
 
-print mldb.perform("PUT", '/v1/procedures/import_titanic_raw', [], { 
-    "type": "import.text",
-    "params": { 
-        "dataFileUrl": "http://public.mldb.ai/titanic_train.csv",
-        "outputDataset": "titanic-train",
-        "runOnCreation": True
-    } 
-})
+# load the train and test datasets
+for dataset_type in ["train", "test"]:
+    datasetConfig = {
+            "type": "sparse.mutable",
+            "id": "titanic-"+dataset_type,
+        }
+
+    dataset = mldb.create_dataset(datasetConfig)
+    def featProc(k, v):
+        if k=="Cabin": return v[0]
+        if k in ["Pclass", "Age", "SibSp", "Parch", "Fare"]: return float(v)
+        return v
+
+    ts = datetime.datetime.now()
+    filename = mldb.plugin.get_plugin_dir() + "/titanic_%s.csv" % dataset_type
+    for idx, csvLine in enumerate(csv.DictReader(open(filename))):
+        tuples = [[k,featProc(k,v),ts] for k,v in csvLine.iteritems() if k != "PassengerId" and v!=""]
+        dataset.record_row(csvLine["PassengerId"], tuples)
+
+    # commit the dataset
+    dataset.commit()
 
 for cls_algo in ["glz", "dt", "bbdt"]:
 
