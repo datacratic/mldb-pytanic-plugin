@@ -4,25 +4,29 @@
 # Copyright (c) 2015 Datacratic Inc. All rights reserved.
 #
 
-import csv, datetime, json
+import csv, datetime
 
 mldb.log("Pytanic Plugin Executing setup...")
 
 
-print mldb.perform("DELETE", "/v1/datasets/titanic-train", [], {})
-print mldb.perform("DELETE", "/v1/datasets/titanic-test", [], {})
+print mldb.perform("DELETE", "/v1/datasets/titanic_train", [], {})
+print mldb.perform("DELETE", "/v1/datasets/titanic_test", [], {})
 
 # load the train and test datasets
 for dataset_type in ["train", "test"]:
     datasetConfig = {
             "type": "sparse.mutable",
-            "id": "titanic-"+dataset_type,
+            "id": "titanic_" + dataset_type,
         }
 
     dataset = mldb.create_dataset(datasetConfig)
     def featProc(k, v):
-        if k=="Cabin": return v[0]
-        if k in ["Pclass", "Age", "SibSp", "Parch", "Fare"]: return float(v)
+        if k=="Cabin":
+            return v[0]
+        elif k in ["Pclass", "Age", "SibSp", "Parch", "Fare"]:
+            return float(v)
+        elif k == 'label':
+            return int(v)
         return v
 
     ts = datetime.datetime.now()
@@ -36,41 +40,44 @@ for dataset_type in ["train", "test"]:
 
 for cls_algo in ["glz", "dt", "bbdt"]:
 
-    print mldb.perform("PUT", "/v1/procedures/titanic_cls_train_%s" % cls_algo, [], {
+    cls_fn_name = 'classifyFunction_' + cls_algo
+    prb_fn_name = 'apply_probabilizer_' + cls_algo
+
+    mldb.log(mldb.perform("PUT", "/v1/procedures/titanic_cls_train_%s" % cls_algo, [], {
         "type": "classifier.train",
         "params": {
-            "trainingData": { 
-                "select" : "{Sex, Age, Fare, Embarked, Parch, SibSp, Pclass} as features, label = '1' as label",
-                "from" : { "id": "titanic-train" },
-                "where": "rowHash() % 5 != 1"
-            },
+            "trainingData": """
+                SELECT {Sex, Age, Fare, Embarked, Parch, SibSp, Pclass} AS features,
+                       label = 1 AS label
+                FROM titanic_train
+                WHERE rowHash() % 5 != 1
+                """,
             "algorithm": cls_algo,
-            "functionName":  "classifyFunction"+cls_algo,
+            "functionName": cls_fn_name,
             "modelFileUrl": "file://models/titanic_%s.cls" % cls_algo,
-            "runOnCreation": True
         }
-    })
-    
-    print mldb.perform("PUT", "/v1/procedures/titanic_prob_train_%s" % cls_algo, [], {
+    }))
+
+    mldb.log(mldb.perform("PUT", "/v1/procedures/titanic_prob_train_%s" % cls_algo, [], {
         "type": "probabilizer.train",
         "params": {
-            "trainingData": { 
-                "select": "classifyFunction"+cls_algo+"( {{Sex, Age, Fare, Embarked, Parch, SibSp, Pclass} AS features})[score] as score, label = '1' as label",
-                "from": { "id": "titanic-train" },
-                "where": "rowHash() % 5 = 1"
-            },
-            "modelFileUrl": "file://models/probabilizer"+cls_algo+".json",
-            "functionName": "apply_probabilizer"+cls_algo,
-            "runOnCreation": True
+            "trainingData": """
+                SELECT %s({{Sex, Age, Fare, Embarked, Parch, SibSp, Pclass} AS features})[score] AS score,
+                       label = 1 AS label
+                FROM titanic_train
+                WHERE rowHash() %% 5 = 1
+                """ % cls_fn_name,
+            "modelFileUrl": "file://models/probabilizer_" + cls_algo + ".json",
+            "functionName": prb_fn_name,
         }
-    })
-    
-    print mldb.perform("PUT", "/v1/functions/probabilizer" + cls_algo, [], {
+    }))
+
+    mldb.log(mldb.perform("PUT", "/v1/functions/probabilizer_" + cls_algo, [], {
         "type": "sql.expression",
         "params": {
-            "expression": "apply_probabilizer%s({classifyFunction%s({features}) as *}) as *" % (cls_algo, cls_algo)
+            "expression": "%s({%s({features}) AS *}) AS *" % (prb_fn_name, cls_fn_name)
         }
-    })
+    }))
 
 # setup static routes
 mldb.plugin.serve_static_folder("/static", "static")
